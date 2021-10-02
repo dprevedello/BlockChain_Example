@@ -29,6 +29,15 @@ class UnitTests(unittest.TestCase):
           os.remove(f)
       os.system('cp %s ./my_test.py' % os.path.abspath(__file__))
 
+  def test_check_chain(self):
+      u1 = User()
+      t1 = self.u.build_transaction(100, u1)
+      self.chain.submit_transaction(t1)
+      t2 = self.u.build_transaction(70, u1)
+      self.chain.submit_transaction(t2)
+      self.chain.build_block()
+      self.assertTrue(self.chain.check_chain())
+
   def test_build_block(self):
       u1 = User()
     
@@ -36,7 +45,7 @@ class UnitTests(unittest.TestCase):
       
       t1 = self.u.build_transaction(100, u1)
       self.chain.submit_transaction(t1)
-      self.chain._build_block()
+      self.chain.build_block()
       self.assertEquals(len(self.chain._chain), l+1)
 
   def test_balance_updated(self):

@@ -70,7 +70,7 @@ class Blockchain:
 			self._pending = [genesis_transaction]
 			self._chain = []
 			self._hardness = pow_hardness
-			self._build_block()
+			self.build_block()
 		else:
 			with open(file, 'r') as f:
 				self.__dict__.update(json.load(f))
@@ -107,7 +107,7 @@ class Blockchain:
 							balance -= float(t[2])
 		return balance
 	
-	def _build_block(self):
+	def build_block(self):
 		if len(self._pending) > 0:
 			prev_hash = 'genesis' if len(self._chain) == 0 else hashlib.sha512(self._chain[-1].encode()).hexdigest()
 			transactions = '\n'.join(self._pending)
@@ -121,3 +121,12 @@ class Blockchain:
 			block = "%s%i\n%s" % (block, pow_n, hashlib.sha512((block+str(pow_n)).encode()).hexdigest())
 			self._pending.clear()
 			self._chain.append(block)
+
+	def check_chain(self):
+		for i, block in enumerate(self._chain):
+			b = block.split('\n')
+			if b[-1] != hashlib.sha512('\n'.join(b[:-1]).encode()).hexdigest():
+				return False
+			if i != 0 and b[0] != hashlib.sha512(self._chain[i-1].encode()).hexdigest():
+				return False
+		return True
